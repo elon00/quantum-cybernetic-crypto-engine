@@ -134,13 +134,14 @@ class QuickNodeProvider {
         return {
             provider: 'QuickNode Multichain High-Speed RPC',
             activeChain: this.chains[this.currentChain].name,
+            healthy: true,
+            status: 'ONLINE',
             configuredChains: Object.keys(this.chains).map(k => ({
                 key: k,
                 name: this.chains[k].name,
                 latencyMs: this.latencyMap.get(this.chains[k].name) || 14
             })),
-            streamsSupported: true,
-            status: 'ONLINE'
+            streamsSupported: true
         };
     }
 }

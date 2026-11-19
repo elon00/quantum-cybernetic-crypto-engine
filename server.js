@@ -20,7 +20,7 @@ const IpfsFleekAdapter = require('./core/ipfs_fleek_adapter');
 const UniversalChainScaffold = require('./core/chain_scaffold');
 const MultimodelAgentOrchestrator = require('./core/multimodel_agents');
 
-const PORT = process.env.PORT || 3000;
+let PORT = parseInt(process.env.PORT, 10) || 3000;
 
 // Initialize System Engines
 const blockchain = new Blockchain();
@@ -310,17 +310,32 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`================================================================`);
-    console.log(` 🚀 QMOOSA UNIVERSAL AI–WEB4–BLOCKCHAIN ENGINE ONLINE!`);
-    console.log(` 📡 Local Dashboard: http://localhost:${PORT}`);
-    console.log(` ⛓️  Consensus: SHA-256 PoW + Quantum Hamiltonian Optimizer`);
-    console.log(` 🌐 QuickNode Multichain RPC: Active with Failover`);
-    console.log(` 💰 x402 Bazaar Protocol: Agent Monetization Active`);
-    console.log(` 🧬 Conway Cellular Automaton: B3/S23 Deterministic Engine`);
-    console.log(` 🛡️  Post-Quantum Cryptography: NIST FIPS 204 Hybrid ML-DSA`);
-    console.log(` 🔄 Raven RSI: Governed Recursive Self-Improvement Loop Active`);
-    console.log(` 🤖 Multimodel AI Agentics: Architecture, Security, QA Online`);
-    console.log(` 📦 Storage & Edge Deploy: IPFS CID + Fleek Config Ready`);
-    console.log(`================================================================`);
+function startServer(portToTry) {
+    server.listen(portToTry, () => {
+        console.log(`================================================================`);
+        console.log(` 🚀 QMOOSA UNIVERSAL AI–WEB4–BLOCKCHAIN ENGINE ONLINE!`);
+        console.log(` 📡 Local Dashboard: http://localhost:${portToTry}`);
+        console.log(` ⛓️  Consensus: SHA-256 PoW + Quantum Hamiltonian Optimizer`);
+        console.log(` 🌐 QuickNode Multichain RPC: Active with Failover`);
+        console.log(` 💰 x402 Bazaar Protocol: Agent Monetization Active`);
+        console.log(` 🧬 Conway Cellular Automaton: B3/S23 Deterministic Engine`);
+        console.log(` 🛡️  Post-Quantum Cryptography: NIST FIPS 204 Hybrid ML-DSA`);
+        console.log(` 🔄 Raven RSI: Governed Recursive Self-Improvement Loop Active`);
+        console.log(` 🤖 Multimodel AI Agentics: Architecture, Security, QA Online`);
+        console.log(` 📦 Storage & Edge Deploy: IPFS CID + Fleek Config Ready`);
+        console.log(`================================================================`);
+    });
+}
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.warn(`⚠️  Port ${PORT} is occupied by another process.`);
+        PORT = PORT + 1;
+        console.log(`🔄 Automatically falling over to http://localhost:${PORT}...`);
+        startServer(PORT);
+    } else {
+        console.error('Server error:', err);
+    }
 });
+
+startServer(PORT);
