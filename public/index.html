@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum-Cybernetic Crypto Engine | Live Real Mainnet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Navigation & Live Ticker -->
+    <header class="header">
+        <div class="brand">
+            <div class="logo-icon">⚛️</div>
+            <div>
+                <h1>QUANTUM-CYBERNETIC CRYPTO ENGINE</h1>
+                <p class="subtitle">secp256k1 ECDSA &bull; SHA-256 PoW &bull; Quantum Wavefunction Optimizer &bull; Cybernetic Homeostasis</p>
+            </div>
+        </div>
+
+        <div class="live-oracle" id="oracleTicker">
+            <div class="ticker-item"><span class="badge live">LIVE ORACLE</span></div>
+            <div class="ticker-item"><span class="symbol">BTC:</span> <span id="btcPrice" class="price">$---</span></div>
+            <div class="ticker-item"><span class="symbol">ETH:</span> <span id="ethPrice" class="price">$---</span></div>
+            <div class="ticker-item"><span class="symbol">SOL:</span> <span id="solPrice" class="price">$---</span></div>
+        </div>
+    </header>
+
+    <!-- Main Grid Dashboard -->
+    <main class="dashboard-grid">
+        <!-- 3D/4D Quantum Network Viewport -->
+        <section class="card viewport-card">
+            <div class="card-header">
+                <h2>🌐 Quantum Dimensional Viewport (3D/4D Projection)</h2>
+                <div class="viewport-controls">
+                    <button id="toggleObserverBtn" class="btn btn-sm btn-accent">Observer: ON (Collapsed)</button>
+                    <span class="tag" id="dimensionTag">4D Spacetime Topology</span>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="quantumCanvas"></canvas>
+            </div>
+            <div class="canvas-footer">
+                <span>Drag to Rotate Orbit</span> &bull; 
+                <span>Entanglement Sync: <strong id="entangleStatus">Active (0ms)</strong></span> &bull; 
+                <span>Observer Mode: <strong id="observerModeText">Wavefunction Collapsed into Solid Geometry</strong></span>
+            </div>
+        </section>
+
+        <!-- Cybernetic Control Loop & Quantum Telemetry -->
+        <section class="card cybernetics-card">
+            <div class="card-header">
+                <h2>🔄 Cybernetics Homeostasis Engine (Norbert Wiener)</h2>
+                <span class="badge" id="stabilityBadge">100% Stable</span>
+            </div>
+            <div class="metric-row">
+                <div class="metric-box">
+                    <div class="metric-label">Target Block Time</div>
+                    <div class="metric-value" id="targetTimeVal">8,000 ms</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Actual Last Block</div>
+                    <div class="metric-value" id="actualTimeVal">--- ms</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">PID Feedback Error</div>
+                    <div class="metric-value" id="feedbackErrorVal">0 ms</div>
+                </div>
+            </div>
+
+            <div class="telemetry-box">
+                <div class="telemetry-item">
+                    <span>PoW Mining Difficulty (Zeros):</span>
+                    <strong id="diffVal">3</strong>
+                </div>
+                <div class="telemetry-item">
+                    <span>Dynamic Base Gas Fee:</span>
+                    <strong id="gasVal">15.0 Gwei</strong>
+                </div>
+                <div class="telemetry-item">
+                    <span>Hamiltonian Ground State Energy:</span>
+                    <strong id="hamiltonianVal">-0.0000</strong>
+                </div>
+                <div class="telemetry-item">
+                    <span>Quantum Interference Factor:</span>
+                    <strong id="interferenceVal">0.992</strong>
+                </div>
+            </div>
+
+            <div class="mining-action-box">
+                <button id="mineBtn" class="btn btn-primary btn-block">⛏️ Mine Next Block (SHA-256 PoW + Quantum Bundle)</button>
+            </div>
+        </section>
+
+        <!-- Cryptographic Wallet & Transaction Studio -->
+        <section class="card wallet-card">
+            <div class="card-header">
+                <h2>🔑 Cryptographic secp256k1 Wallet Studio</h2>
+                <button id="newWalletBtn" class="btn btn-sm btn-outline">+ New Real Wallet</button>
+            </div>
+
+            <div class="wallet-info-panel">
+                <div class="wallet-field">
+                    <label>Active Wallet Address:</label>
+                    <div class="copyable-text" id="walletAddress">0x...</div>
+                </div>
+                <div class="wallet-balance-row">
+                    <div>Balance: <span class="balance-number" id="walletBalance">0.00</span> <span class="currency">QCY</span></div>
+                    <div class="tag">secp256k1 ECDSA</div>
+                </div>
+            </div>
+
+            <form id="txForm" class="tx-form">
+                <h3>Submit Signed Cryptographic Transaction</h3>
+                <div class="form-group">
+                    <label>Recipient Address:</label>
+                    <input type="text" id="recipientInput" placeholder="0x..." required />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Amount (QCY):</label>
+                        <input type="number" id="amountInput" step="0.1" min="0.1" placeholder="10.0" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Priority Fee (QCY):</label>
+                        <input type="number" id="feeInput" step="0.1" min="0.1" value="1.0" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">⚡ Sign & Broadcast Transaction</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Bottom Blockchain Ledger & Mempool -->
+    <section class="bottom-section">
+        <div class="card">
+            <div class="card-header">
+                <h2>⛓️ Verified Blockchain Ledger (SHA-256 Blocks & Merkle Roots)</h2>
+                <span class="badge" id="blockCountBadge">1 Block</span>
+            </div>
+            <div class="blocks-container" id="blocksContainer">
+                <!-- Injected via app.js -->
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>🌊 Quantum Mempool (Superposed Pending Transactions)</h2>
+                <span class="badge" id="mempoolBadge">0 Pending</span>
+            </div>
+            <div class="mempool-container" id="mempoolContainer">
+                <div class="empty-state">Mempool is currently empty. Submit a signed transaction above!</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Quantum-Cybernetic Crypto Engine &bull; Zero Mock Data &bull; 100% Real Cryptography & Live Oracle Feeds</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
