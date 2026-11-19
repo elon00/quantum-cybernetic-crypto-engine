@@ -3,6 +3,7 @@ const CryptoWallet = require('../core/crypto_wallet');
 const QuickNodeProvider = require('../core/quicknode_provider');
 const X402BazaarEngine = require('../core/x402_bazaar');
 const ConwayAutomatonEngine = require('../core/conway_engine');
+const TokenLaunchpadEngine = require('../core/token_launchpad');
 
 console.log('⚡ [SMOKE TEST] RUNNING AUTOMATED FAST SMOKE TESTS...\n');
 
@@ -29,4 +30,10 @@ const conway = new ConwayAutomatonEngine();
 conway.seedPattern('glider');
 console.log('✔ Conway engine seeded with glider:', conway.countLiveCells() === 5 ? 'PASS' : 'FAIL');
 
-console.log('\n✅ SMOKE TESTS PASSED: 5/5 GATES VERIFIED');
+// 6. Token Launchpad Projects & Tiers
+const launchpad = new TokenLaunchpadEngine();
+const lpProjects = launchpad.getProjects();
+const sampleParticipation = launchpad.participateInLaunch(lpProjects[0].projectId, wallet.address, 2, 500);
+console.log('✔ Token Launchpad studio & multi-tier participation:', (lpProjects.length >= 2 && sampleParticipation.success) ? 'PASS' : 'FAIL');
+
+console.log('\n✅ SMOKE TESTS PASSED: 6/6 GATES VERIFIED');

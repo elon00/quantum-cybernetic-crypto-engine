@@ -540,3 +540,73 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
 }
+
+/* Token Launchpad Styles */
+.launchpad-card {
+    background: #090e18;
+    border: 1px solid #1b263b;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.launchpad-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.lp-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--accent-cyan);
+}
+
+.lp-symbol {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.lp-progress-container {
+    width: 100%;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.lp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #10b981);
+    transition: width 0.3s ease;
+}
+
+.lp-tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: #060910;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #141c2c;
+}
+
+.lp-tier-item {
+    font-size: 0.72rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lp-tier-name {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.lp-tier-price {
+    color: var(--accent-green);
+    font-family: monospace;
+}

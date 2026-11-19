@@ -593,3 +593,188 @@ if (agentSendBtn && agentInput) {
         }
     };
 }
+
+// ----------------------------------------------------
+// 5. QMOOSA Sovereign Token Launchpad Client Logic
+// ----------------------------------------------------
+const launchpadContainer = document.getElementById('launchpadProjectsContainer');
+const toggleCreateLaunchBtn = document.getElementById('toggleCreateLaunchBtn');
+const createLaunchPanel = document.getElementById('createLaunchPanel');
+const createLaunchForm = document.getElementById('createLaunchForm');
+const cancelLaunchBtn = document.getElementById('cancelLaunchBtn');
+
+const toggleCalcBtn = document.getElementById('toggleCalcBtn');
+const emissionCalcPanel = document.getElementById('emissionCalcPanel');
+const runCalcBtn = document.getElementById('runCalcBtn');
+const calcSupply = document.getElementById('calcSupply');
+const calcMint = document.getElementById('calcMint');
+const calcResult = document.getElementById('calcResult');
+
+// Toggle Panels
+if (toggleCreateLaunchBtn && createLaunchPanel) {
+    toggleCreateLaunchBtn.onclick = () => {
+        createLaunchPanel.style.display = createLaunchPanel.style.display === 'none' ? 'block' : 'none';
+    };
+}
+if (cancelLaunchBtn && createLaunchPanel) {
+    cancelLaunchBtn.onclick = () => { createLaunchPanel.style.display = 'none'; };
+}
+
+if (toggleCalcBtn && emissionCalcPanel) {
+    toggleCalcBtn.onclick = () => {
+        emissionCalcPanel.style.display = emissionCalcPanel.style.display === 'none' ? 'block' : 'none';
+    };
+}
+
+// Fetch & Render Launchpad Projects
+async function fetchLaunchpadProjects() {
+    if (!launchpadContainer) return;
+    try {
+        const res = await fetch('/api/launchpad/projects');
+        const d = await res.json();
+        if (!d.success || !d.projects) return;
+
+        launchpadContainer.innerHTML = '';
+        for (const p of d.projects) {
+            const card = document.createElement('div');
+            card.className = 'launchpad-card';
+            card.innerHTML = `
+                <div class="launchpad-card-header">
+                    <div>
+                        <div class="lp-title">${p.tokenName} <span class="lp-symbol">(${p.tokenSymbol})</span></div>
+                        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">Target Chain: <strong style="color:#38bdf8;">${p.targetChain}</strong></div>
+                    </div>
+                    <span class="badge ${p.status === 'GOAL_REACHED' ? 'live' : ''}">${p.status}</span>
+                </div>
+
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.78rem;">
+                        <span>Raised: <strong>$${p.currentRaisedUSD.toLocaleString()}</strong></span>
+                        <span>Target: <strong>$${p.targetRaiseUSD.toLocaleString()}</strong> (${p.progressPercent}%)</span>
+                    </div>
+                    <div class="lp-progress-container">
+                        <div class="lp-progress-fill" style="width: ${Math.min(100, p.progressPercent)}%;"></div>
+                    </div>
+                </div>
+
+                <div class="lp-tiers-grid">
+                    ${p.tiers.map(t => `
+                        <div class="lp-tier-item">
+                            <span class="lp-tier-name">${t.name}</span>
+                            <span class="lp-tier-price">$${t.priceUSD}</span>
+                            <span style="color:#64748b;">Lock: ${t.lockDays}d</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+                    <select id="tierSelect_${p.projectId}" style="background:#0f172a; border:1px solid #1e293b; color:#fff; font-size:0.75rem; padding:6px; border-radius:4px; flex:1;">
+                        <option value="0">Seed Tier (50% Off &bull; 365d Lock)</option>
+                        <option value="1">Strategic Tier (20% Off &bull; 180d Lock)</option>
+                        <option value="2" selected>Public TGE Tier (No Lock)</option>
+                    </select>
+                    <input type="number" id="amtInput_${p.projectId}" value="100" min="10" step="10" style="width:80px; background:#0f172a; border:1px solid #1e293b; color:#fff; font-size:0.75rem; padding:6px; border-radius:4px;" />
+                    <button class="btn btn-sm btn-success" onclick="participateLaunch('${p.projectId}')">Participate</button>
+                </div>
+            `;
+            launchpadContainer.appendChild(card);
+        }
+    } catch (e) {
+        console.error('Launchpad load error:', e);
+    }
+}
+
+// Global participation function
+window.participateLaunch = async (projectId) => {
+    const tierEl = document.getElementById(`tierSelect_${projectId}`);
+    const amtEl = document.getElementById(`amtInput_${projectId}`);
+    const tierId = tierEl ? parseInt(tierEl.value) : 2;
+    const amountUSD = amtEl ? parseFloat(amtEl.value) : 100;
+    const addr = activeWallet ? activeWallet.address : '0x71C...B29';
+
+    try {
+        const res = await fetch('/api/launchpad/participate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId, tierId, amountUSD, contributorAddress: addr })
+        });
+        const d = await res.json();
+        if (d.success) {
+            alert(`🎉 LAUNCHPAD CONTRIBUTION CONFIRMED!\nTokens Awarded: ${d.contribution.tokensAwarded} ${d.project.tokenSymbol}\nTier: ${d.contribution.tierName}\nLock Period: ${d.contribution.lockDays} Days\nTx Proof: ${d.contribution.txProof.slice(0, 24)}...`);
+            fetchLaunchpadProjects();
+        } else {
+            alert('Participation failed: ' + d.error);
+        }
+    } catch (err) {
+        alert('Participation error: ' + err.message);
+    }
+};
+
+// Create Launch Form Submit
+if (createLaunchForm) {
+    createLaunchForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            tokenName: document.getElementById('lpTokenName').value.trim(),
+            tokenSymbol: document.getElementById('lpTokenSymbol').value.trim(),
+            targetChain: document.getElementById('lpTargetChain').value,
+            initialSupply: parseFloat(document.getElementById('lpInitialSupply').value),
+            salePriceUSD: parseFloat(document.getElementById('lpSalePrice').value),
+            targetRaiseUSD: parseFloat(document.getElementById('lpTargetRaise').value)
+        };
+
+        try {
+            const res = await fetch('/api/launchpad/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const d = await res.json();
+            if (d.success) {
+                alert(`🚀 NEW TOKEN LAUNCHPAD CREATED!\nProject: ${d.project.tokenName} (${d.project.tokenSymbol})\nTarget Chain: ${d.project.targetChain}\nBytecode Hash: ${d.project.contractBytecodeHash.slice(0, 24)}...`);
+                createLaunchPanel.style.display = 'none';
+                createLaunchForm.reset();
+                fetchLaunchpadProjects();
+            } else {
+                alert('Creation failed: ' + d.error);
+            }
+        } catch (err) {
+            alert('Create launch error: ' + err.message);
+        }
+    };
+}
+
+// Emission Calculator
+if (runCalcBtn) {
+    runCalcBtn.onclick = async () => {
+        const supply = parseFloat(calcSupply.value);
+        const mint = parseFloat(calcMint.value);
+        try {
+            const res = await fetch('/api/launchpad/emission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentSupply: supply, requestedMint: mint })
+            });
+            const d = await res.json();
+            if (d.success) {
+                const em = d.emission;
+                calcResult.innerHTML = `
+                    <div style="color:${em.isThrottled ? '#f59e0b' : '#10b981'}; font-weight:600;">
+                        Status: ${em.isThrottled ? '⚠️ THROTTLED BY GOVERNANCE (Requested > 8% Cap)' : '✔ APPROVED UNDER 8% CEILING'}
+                    </div>
+                    <div style="margin-top:4px; font-size:0.75rem; color:#94a3b8;">
+                        Current Total Supply: <strong>${em.currentTotalSupply.toLocaleString()}</strong> &bull; 
+                        Annual 8% Ceiling: <strong style="color:#38bdf8;">${em.annualCeiling.toLocaleString()}</strong> &bull; 
+                        Approved Mint M(t): <strong style="color:#10b981;">${em.approvedMint.toLocaleString()}</strong>
+                        ${em.isThrottled ? `<br><span style="color:#f43f5e;">Rejected Inflation Delta: -${em.rejectionDelta.toLocaleString()}</span>` : ''}
+                    </div>
+                `;
+            }
+        } catch (e) {
+            calcResult.textContent = 'Calculation error: ' + e.message;
+        }
+    };
+}
+
+// Call on startup
+fetchLaunchpadProjects();

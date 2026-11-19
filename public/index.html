@@ -228,6 +228,84 @@
         </div>
     </section>
 
+    <!-- QMOOSA Sovereign Token Launchpad Studio -->
+    <section class="card launchpad-section" style="margin-bottom:24px;">
+        <div class="card-header">
+            <div>
+                <h2>🚀 QMOOSA Sovereign Token Launchpad & Fair-Launch Studio</h2>
+                <p class="subtitle" style="margin-top:2px;">Multi-Tier Presales &bull; Bounded Emission Economics M(t) &bull; Automated Liquidity Locks</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button id="toggleCreateLaunchBtn" class="btn btn-sm btn-primary">+ Create Token Launch</button>
+                <button id="toggleCalcBtn" class="btn btn-sm btn-outline">🧮 Emission Calculator</button>
+            </div>
+        </div>
+
+        <!-- Create Launch Form (collapsible) -->
+        <div id="createLaunchPanel" style="display:none; background:#070b14; padding:14px; border-radius:8px; border:1px solid #1e293b; margin-top:8px;">
+            <h3 style="font-size:0.9rem; color:#38bdf8; margin-bottom:10px;">Deploy New Multi-Tier Launchpad Project</h3>
+            <form id="createLaunchForm" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Token Name:</label>
+                    <input type="text" id="lpTokenName" placeholder="e.g. Nexus Protocol" required style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Token Symbol:</label>
+                    <input type="text" id="lpTokenSymbol" placeholder="e.g. NXS" required style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Target Blockchain:</label>
+                    <select id="lpTargetChain" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;">
+                        <option value="Base">Base Layer 2</option>
+                        <option value="Ethereum">Ethereum</option>
+                        <option value="Solana">Solana</option>
+                        <option value="Polygon">Polygon</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Initial Supply:</label>
+                    <input type="number" id="lpInitialSupply" value="100000000" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Sale Price (USD):</label>
+                    <input type="number" id="lpSalePrice" step="0.01" value="0.05" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div>
+                    <label style="font-size:0.72rem; color:#94a3b8;">Target Raise (USD):</label>
+                    <input type="number" id="lpTargetRaise" value="250000" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div style="grid-column:span 3; display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+                    <button type="button" id="cancelLaunchBtn" class="btn btn-sm btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-success">🚀 Initialize & Deploy Launchpad</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Governed Emission Calculator Widget (collapsible) -->
+        <div id="emissionCalcPanel" style="display:none; background:#070b14; padding:14px; border-radius:8px; border:1px solid #1e293b; margin-top:8px;">
+            <h3 style="font-size:0.9rem; color:#38bdf8; margin-bottom:8px;">Governed Emission Limit Calculator: M(t) = min(R(t), annual_emission_limit)</h3>
+            <div style="display:flex; gap:12px; align-items:flex-end;">
+                <div style="flex:1;">
+                    <label style="font-size:0.72rem; color:#94a3b8;">Current Total Supply:</label>
+                    <input type="number" id="calcSupply" value="100000000" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.72rem; color:#94a3b8;">Requested Mint (R(t)):</label>
+                    <input type="number" id="calcMint" value="12000000" style="width:100%; background:#0f172a; border:1px solid #1e293b; color:#fff; padding:6px; border-radius:4px; font-size:0.8rem;" />
+                </div>
+                <button id="runCalcBtn" class="btn btn-sm btn-primary" style="height:32px;">Calculate Bound</button>
+            </div>
+            <div id="calcResult" style="margin-top:10px; font-size:0.8rem; background:#0b1120; padding:8px; border-radius:6px; border:1px solid #1e293b;">
+                Enter supply and mint request to evaluate against the 8% annual governance ceiling.
+            </div>
+        </div>
+
+        <!-- Launchpad Projects Cards Container -->
+        <div class="launchpad-grid" id="launchpadProjectsContainer" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; margin-top:14px;">
+            <!-- Dynamically populated via app.js -->
+        </div>
+    </section>
+
     <!-- Bottom Blockchain Ledger & Mempool -->
     <section class="bottom-section">
         <div class="card">

@@ -254,6 +254,31 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { success: true, projects: tokenLaunchpad.getProjects() });
     }
 
+    if (pathname === '/api/launchpad/create' && req.method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const project = tokenLaunchpad.createLaunchpadProject(body);
+            return sendJson(res, 200, { success: true, project });
+        } catch (err) {
+            return sendJson(res, 400, { success: false, error: err.message });
+        }
+    }
+
+    if (pathname === '/api/launchpad/participate' && req.method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const result = tokenLaunchpad.participateInLaunch(
+                body.projectId,
+                body.contributorAddress || defaultUserWallet.address,
+                parseInt(body.tierId !== undefined ? body.tierId : 2),
+                parseFloat(body.amountUSD || 100)
+            );
+            return sendJson(res, 200, result);
+        } catch (err) {
+            return sendJson(res, 400, { success: false, error: err.message });
+        }
+    }
+
     if (pathname === '/api/launchpad/emission' && req.method === 'POST') {
         const body = await parseBody(req);
         const calc = tokenLaunchpad.calculateEmissionLimit(body.currentSupply || 1000000, body.requestedMint || 50000);
