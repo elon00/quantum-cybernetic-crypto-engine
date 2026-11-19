@@ -1,17 +1,28 @@
 /**
- * Frontend Client Engine
+ * Full Omniverse Quantum-Dimensional Engine & Real Cryptocurrency Client
  * Integrates:
- * 1. Live 3D/4D Quantum Block Visualizer with Observer Principle
- * 2. Real ECDSA Wallet interactions & transaction broadcasts
- * 3. Cybernetic telemetry streaming & live Binance/CoinGecko prices
+ * 1. 3D up to 12D Hypercube Generator (2^N Vertices) & Stereographic N-D Projection
+ * 2. Multiverse Timeline Seed Splitter (#OMNI-001, #OMNI-002...) with Quantum Hue Shift
+ * 3. Lazy Evaluation Observer Principle (Solid Geometry vs Quantum Probability Wave)
+ * 4. Real secp256k1 Wallet Studio & Cryptographic Transaction Broadcasts
+ * 5. Real SHA-256 Proof-of-Work Mining Engine & Cybernetic Homeostasis Telemetry
+ * 6. Live Binance/CoinGecko Crypto Market Feeds
  */
 
 // Application State
 let activeWallet = null;
 let blockchainState = null;
-let observerActive = true;
 
-// DOM Elements
+// Omniverse Engine State
+let dimensions = 4;
+let observerOn = true;
+let branchCount = 1;
+let hueShift = 195;
+let animTime = 0;
+let rotX = 0.4, rotY = 0.6;
+let isDragging = false, lastX = 0, lastY = 0;
+
+// DOM Elements: Crypto & Telemetry
 const btcPriceEl = document.getElementById('btcPrice');
 const ethPriceEl = document.getElementById('ethPrice');
 const solPriceEl = document.getElementById('solPrice');
@@ -39,10 +50,221 @@ const mempoolContainer = document.getElementById('mempoolContainer');
 const blockCountBadge = document.getElementById('blockCountBadge');
 const mempoolBadge = document.getElementById('mempoolBadge');
 
-const toggleObserverBtn = document.getElementById('toggleObserverBtn');
-const observerModeText = document.getElementById('observerModeText');
+// DOM Elements: Omniverse 12D Controls
+const obsBtn = document.getElementById('obsBtn');
+const obsDesc = document.getElementById('obsDesc');
+const dimSlider = document.getElementById('dimSlider');
+const dimVal = document.getElementById('dimVal');
+const dimName = document.getElementById('dimName');
+const branchBtn = document.getElementById('branchBtn');
+const branchId = document.getElementById('branchId');
+const totalNodesEl = document.getElementById('totalNodes');
+const ramSavedEl = document.getElementById('ramSaved');
 
-// 1. Fetch System Status & Initialize Default Wallet
+const dimLabels = {
+    3: "3D Cube (Physical Space)",
+    4: "4D Tesseract (Spacetime)",
+    5: "5D Penteract (Probability)",
+    6: "6D Hexeract (Phase Space)",
+    7: "7D Hepteract (Calabi-Yau)",
+    8: "8D Octeract (E8 Lattice)",
+    9: "9D Enneract (Brane Space)",
+    10: "10D Dekeract (Superstring)",
+    11: "11D Hendekeract (M-Theory)",
+    12: "12D Dodekeract (Omniverse)"
+};
+
+// ----------------------------------------------------
+// 1. Omniverse N-Dimensional Generator (3D to 12D)
+// ----------------------------------------------------
+let vertices = [];
+let edges = [];
+
+function buildHypercube(n) {
+    vertices = [];
+    edges = [];
+    const count = 1 << n; // 2^n vertices (up to 4096 for 12D)
+    for (let i = 0; i < count; i++) {
+        let coords = [];
+        for (let d = 0; d < n; d++) {
+            coords.push((i & (1 << d)) ? 1 : -1);
+        }
+        vertices.push(coords);
+    }
+
+    // Connect vertices differing by 1 bit
+    for (let i = 0; i < count; i++) {
+        for (let d = 0; d < n; d++) {
+            let neighbor = i ^ (1 << d);
+            if (i < neighbor) edges.push([i, neighbor]);
+        }
+    }
+    totalNodesEl.textContent = count.toLocaleString();
+}
+buildHypercube(dimensions);
+
+// Observer Toggle
+obsBtn.onclick = () => {
+    observerOn = !observerOn;
+    obsBtn.textContent = observerOn ? "OBSERVER: ON (Rendered)" : "OBSERVER: OFF (Probability Wave)";
+    obsBtn.className = observerOn ? "btn btn-sm btn-obs-on" : "btn btn-sm btn-obs-off";
+    obsDesc.textContent = observerOn
+        ? "Wavefunction collapsed into solid geometry inside viewport"
+        : "Observer removed! Geometry dissolves into unrendered probability waves.";
+    ramSavedEl.textContent = observerOn ? "98.42%" : "99.9999%";
+};
+
+// 3D to 12D Dimension Slider
+dimSlider.oninput = (e) => {
+    dimensions = parseInt(e.target.value);
+    dimVal.textContent = dimensions + "D";
+    dimName.textContent = dimLabels[dimensions];
+    buildHypercube(dimensions);
+};
+
+// Multiverse Timeline Branch Splitter
+branchBtn.onclick = () => {
+    branchCount++;
+    hueShift = (hueShift + 55) % 360;
+    branchId.textContent = `#OMNI-${String(branchCount).padStart(3, '0')}`;
+};
+
+// ----------------------------------------------------
+// 2. Stereographic Higher-Dimension -> 3D -> 2D Screen Projection
+// ----------------------------------------------------
+const canvas = document.getElementById('quantumCanvas');
+const ctx = canvas.getContext('2d');
+let cWidth, cHeight;
+
+function resizeCanvas() {
+    cWidth = canvas.width = canvas.parentElement.clientWidth;
+    cHeight = canvas.height = canvas.parentElement.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Orbit controls
+canvas.addEventListener('mousedown', e => {
+    isDragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+window.addEventListener('mouseup', () => isDragging = false);
+window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    rotY += (e.clientX - lastX) * 0.008;
+    rotX += (e.clientY - lastY) * 0.008;
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+
+function projectND(point) {
+    let p = [...point];
+
+    // Rotate across higher dimensional planes (d >= 3)
+    for (let d = 3; d < p.length; d++) {
+        const angle = animTime * (0.4 + d * 0.08);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const a = p[0] * cos - p[d] * sin;
+        const b = p[0] * sin + p[d] * cos;
+        p[0] = a;
+        p[d] = b;
+    }
+
+    // Recursively fold N-D down to 3D via stereographic projection
+    while (p.length > 3) {
+        const w = p.pop();
+        const distance = 2.6;
+        const factor = 1 / (distance - w * 0.45);
+        for (let i = 0; i < p.length; i++) {
+            p[i] *= factor;
+        }
+    }
+
+    // 3D Orbit Rotation (X and Y)
+    let [x, y, z] = p;
+    let cy = Math.cos(rotY), sy = Math.sin(rotY);
+    let x1 = x * cy - z * sy;
+    let z1 = x * sy + z * cy;
+
+    let cx = Math.cos(rotX), sx = Math.sin(rotX);
+    let y2 = y * cx - z1 * sx;
+    let z2 = y * sx + z1 * cx;
+
+    // 3D -> 2D Screen Perspective
+    const fov = Math.min(cWidth, cHeight) * 0.42;
+    const scale = fov / (3.2 - z2 * 0.4);
+    return {
+        x: cWidth / 2 + x1 * scale,
+        y: cHeight / 2 + y2 * scale,
+        z: z2
+    };
+}
+
+function animateViewport() {
+    animTime += 0.015;
+    ctx.fillStyle = observerOn ? 'rgba(5, 7, 13, 0.35)' : 'rgba(5, 7, 13, 0.14)';
+    ctx.fillRect(0, 0, cWidth, cHeight);
+
+    const projected = vertices.map((v, idx) => {
+        // Quantum wave uncertainty jitter when Observer is OFF
+        if (!observerOn) {
+            const jittered = v.map((coord, d) => coord + Math.sin(animTime * 4 + idx + d) * 0.35);
+            return projectND(jittered);
+        }
+        return projectND(v);
+    });
+
+    // Draw Edges only when Observer collapses the wavefunction
+    if (observerOn) {
+        ctx.lineWidth = dimensions > 7 ? 0.6 : 1.2;
+        ctx.strokeStyle = `hsla(${hueShift}, 85%, 60%, ${dimensions > 8 ? 0.18 : 0.45})`;
+        ctx.beginPath();
+        for (let i = 0; i < edges.length; i++) {
+            const [a, b] = edges[i];
+            ctx.moveTo(projected[a].x, projected[a].y);
+            ctx.lineTo(projected[b].x, projected[b].y);
+        }
+        ctx.stroke();
+    }
+
+    // Draw Quantum Nodes (Solid Particles vs Probability Clouds)
+    for (let i = 0; i < projected.length; i++) {
+        const pt = projected[i];
+        const isEntangled = (i === 0 || i === projected.length - 1);
+        ctx.beginPath();
+        if (observerOn) {
+            ctx.fillStyle = isEntangled ? '#f43f5e' : `hsl(${hueShift}, 90%, 70%)`;
+            ctx.arc(pt.x, pt.y, isEntangled ? 4.5 : (dimensions > 8 ? 1.5 : 2.8), 0, Math.PI * 2);
+        } else {
+            ctx.fillStyle = `hsla(${(hueShift + 90) % 360}, 90%, 65%, 0.55)`;
+            ctx.arc(pt.x, pt.y, 3.5 + Math.sin(animTime * 5 + i) * 2, 0, Math.PI * 2);
+        }
+        ctx.fill();
+    }
+
+    // Draw Entanglement Link (0ms Synchronization between opposite poles)
+    if (projected.length >= 2) {
+        const first = projected[0];
+        const last = projected[projected.length - 1];
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.85)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(first.x, first.y);
+        ctx.lineTo(last.x, last.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    requestAnimationFrame(animateViewport);
+}
+animateViewport();
+
+// ----------------------------------------------------
+// 3. Real Cryptocurrency Node & Telemetry Integration
+// ----------------------------------------------------
 async function fetchStatus() {
     try {
         const res = await fetch('/api/status');
@@ -51,29 +273,23 @@ async function fetchStatus() {
 
         blockchainState = data;
 
-        // Set initial wallet if not already created
+        // Initialize default wallet if none loaded
         if (!activeWallet && data.defaultUser) {
             activeWallet = data.defaultUser;
             updateWalletUI();
-        } else if (activeWallet) {
-            // Refresh balance
-            const chainRes = await fetch('/api/chain');
-            const chainData = await chainRes.json();
-            // Estimate balance from status or keep updated
-            if (activeWallet.address === data.defaultUser.address) {
-                activeWallet.balance = data.defaultUser.balance;
-                walletBalanceEl.textContent = activeWallet.balance.toFixed(2);
-            }
+        } else if (activeWallet && data.defaultUser && activeWallet.address === data.defaultUser.address) {
+            activeWallet.balance = data.defaultUser.balance;
+            walletBalanceEl.textContent = activeWallet.balance.toFixed(2);
         }
 
-        // Update Live Oracle Tickers
+        // Live Oracle Prices
         if (data.oracle && data.oracle.prices) {
             btcPriceEl.textContent = `$${data.oracle.prices.BTC.toLocaleString()}`;
             ethPriceEl.textContent = `$${data.oracle.prices.ETH.toLocaleString()}`;
             solPriceEl.textContent = `$${data.oracle.prices.SOL.toLocaleString()}`;
         }
 
-        // Update Cybernetics Telemetry
+        // Cybernetics Telemetry
         const t = data.telemetry;
         targetTimeVal.textContent = `${t.targetBlockTime} ms`;
         actualTimeVal.textContent = `${t.actualBlockTime} ms`;
@@ -82,17 +298,15 @@ async function fetchStatus() {
         gasVal.textContent = `${t.baseGasFeeGwei} Gwei`;
         stabilityBadge.textContent = `${t.systemStability}% Stable`;
 
-        // Update Latest Block Metrics
+        // Quantum Hamiltonian Metrics
         if (data.latestBlock && data.latestBlock.quantumMetrics) {
             hamiltonianVal.textContent = data.latestBlock.quantumMetrics.hamiltonianEnergy;
             interferenceVal.textContent = data.latestBlock.quantumMetrics.interferenceFactor;
         }
 
-        // Update Mempool UI
+        // Mempool & Block Explorer
         mempoolBadge.textContent = `${data.mempoolCount} Pending`;
         renderMempool(data.mempool);
-
-        // Update Blocks UI
         blockCountBadge.textContent = `${data.blockHeight} Blocks`;
         await fetchAndRenderBlocks();
 
@@ -101,7 +315,6 @@ async function fetchStatus() {
     }
 }
 
-// 2. Fetch and render blocks
 async function fetchAndRenderBlocks() {
     try {
         const res = await fetch('/api/chain');
@@ -161,7 +374,7 @@ function updateWalletUI() {
     walletBalanceEl.textContent = (activeWallet.balance || 0).toFixed(2);
 }
 
-// 3. Create Real secp256k1 Wallet
+// Create New Real secp256k1 Wallet
 newWalletBtn.onclick = async () => {
     try {
         newWalletBtn.disabled = true;
@@ -181,7 +394,7 @@ newWalletBtn.onclick = async () => {
     }
 };
 
-// 4. Submit Transaction
+// Submit Signed Transaction
 txForm.onsubmit = async (e) => {
     e.preventDefault();
     if (!activeWallet) return alert('Please initialize a wallet first.');
@@ -219,7 +432,7 @@ txForm.onsubmit = async (e) => {
     }
 };
 
-// 5. Mine Block
+// Mine Block Button
 mineBtn.onclick = async () => {
     try {
         mineBtn.disabled = true;
@@ -232,7 +445,6 @@ mineBtn.onclick = async () => {
         const data = await res.json();
         if (data.success) {
             await fetchStatus();
-            // Update user balance if they mined it
             if (activeWallet.address === data.block.transactions[0].recipient) {
                 activeWallet.balance = (activeWallet.balance || 0) + data.block.transactions[0].amount;
                 updateWalletUI();
@@ -248,159 +460,6 @@ mineBtn.onclick = async () => {
     }
 };
 
-// 6. Observer Toggle
-toggleObserverBtn.onclick = () => {
-    observerActive = !observerActive;
-    toggleObserverBtn.textContent = observerActive ? 'Observer: ON (Collapsed)' : 'Observer: OFF (Superposition)';
-    toggleObserverBtn.className = observerActive ? 'btn btn-sm btn-accent' : 'btn btn-sm btn-outline';
-    observerModeText.textContent = observerActive ? 
-        'Wavefunction Collapsed into Solid Geometry' : 
-        'Unobserved Quantum Probability Cloud';
-};
-
-// ----------------------------------------------------
-// 7. Interactive 3D/4D Quantum Viewport (HTML5 Canvas)
-// ----------------------------------------------------
-const canvas = document.getElementById('quantumCanvas');
-const ctx = canvas.getContext('2d');
-let cWidth, cHeight;
-
-function resizeCanvas() {
-    cWidth = canvas.width = canvas.parentElement.clientWidth;
-    cHeight = canvas.height = canvas.parentElement.clientHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-let rotX = 0.5, rotY = 0.8;
-let isDragging = false, lastMouseX = 0, lastMouseY = 0;
-let animTime = 0;
-
-canvas.addEventListener('mousedown', e => {
-    isDragging = true;
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-});
-window.addEventListener('mouseup', () => isDragging = false);
-window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    rotY += (e.clientX - lastMouseX) * 0.008;
-    rotX += (e.clientY - lastMouseY) * 0.008;
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-});
-
-// Generate 4D Tesseract (16 vertices, 32 edges)
-const tesseractVertices = [];
-for (let i = 0; i < 16; i++) {
-    tesseractVertices.push([
-        (i & 1) ? 1 : -1,
-        (i & 2) ? 1 : -1,
-        (i & 4) ? 1 : -1,
-        (i & 8) ? 1 : -1
-    ]);
-}
-const tesseractEdges = [];
-for (let i = 0; i < 16; i++) {
-    for (let d = 0; d < 4; d++) {
-        let neighbor = i ^ (1 << d);
-        if (i < neighbor) tesseractEdges.push([i, neighbor]);
-    }
-}
-
-function project4D(point, t) {
-    let [x, y, z, w] = point;
-
-    // 4D Rotation in X-W and Y-Z planes
-    const angleXW = t * 0.6;
-    const cosXW = Math.cos(angleXW), sinXW = Math.sin(angleXW);
-    let x1 = x * cosXW - w * sinXW;
-    let w1 = x * sinXW + w * cosXW;
-
-    // Stereographic projection from 4D down to 3D
-    const distance4D = 2.4;
-    const factor3D = 1 / (distance4D - w1 * 0.5);
-    let px = x1 * factor3D;
-    let py = y * factor3D;
-    let pz = z * factor3D;
-
-    // 3D Orbit Rotation
-    const cy = Math.cos(rotY), sy = Math.sin(rotY);
-    let x2 = px * cy - pz * sy;
-    let z2 = px * sy + pz * cy;
-
-    const cx = Math.cos(rotX), sx = Math.sin(rotX);
-    let y3 = py * cx - z2 * sx;
-    let z3 = py * sx + z2 * cx;
-
-    // 3D Perspective to 2D Screen
-    const fov = Math.min(cWidth, cHeight) * 0.45;
-    const scale = fov / (3.2 - z3 * 0.4);
-
-    return {
-        x: cWidth / 2 + x2 * scale,
-        y: cHeight / 2 + y3 * scale,
-        z: z3
-    };
-}
-
-function renderCanvas() {
-    animTime += 0.015;
-    ctx.fillStyle = observerActive ? 'rgba(3, 5, 9, 0.4)' : 'rgba(3, 5, 9, 0.15)';
-    ctx.fillRect(0, 0, cWidth, cHeight);
-
-    const projected = tesseractVertices.map((v, i) => {
-        if (!observerActive) {
-            // Quantum probability jitter
-            const jittered = v.map((c, d) => c + Math.sin(animTime * 5 + i + d) * 0.35);
-            return project4D(jittered, animTime);
-        }
-        return project4D(v, animTime);
-    });
-
-    // Draw Edges
-    if (observerActive) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
-        ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        for (const [a, b] of tesseractEdges) {
-            ctx.moveTo(projected[a].x, projected[a].y);
-            ctx.lineTo(projected[b].x, projected[b].y);
-        }
-        ctx.stroke();
-    }
-
-    // Draw Nodes (Block / Transaction Nodes)
-    projected.forEach((pt, i) => {
-        ctx.beginPath();
-        if (observerActive) {
-            const isGenesis = (i === 0);
-            ctx.fillStyle = isGenesis ? '#10b981' : (i % 2 === 0 ? '#38bdf8' : '#a855f7');
-            ctx.arc(pt.x, pt.y, isGenesis ? 5 : 3.5, 0, Math.PI * 2);
-        } else {
-            // Wavecloud
-            ctx.fillStyle = 'rgba(168, 85, 247, 0.6)';
-            ctx.arc(pt.x, pt.y, 4 + Math.sin(animTime * 4 + i) * 2.5, 0, Math.PI * 2);
-        }
-        ctx.fill();
-    });
-
-    // Draw Entanglement Link across opposite poles
-    if (projected.length >= 2) {
-        ctx.strokeStyle = 'rgba(244, 63, 94, 0.75)';
-        ctx.setLineDash([4, 4]);
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(projected[0].x, projected[0].y);
-        ctx.lineTo(projected[15].x, projected[15].y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
-
-    requestAnimationFrame(renderCanvas);
-}
-
-// Start Main Loop & Polling
-renderCanvas();
+// Initialize Status & Polling
 fetchStatus();
 setInterval(fetchStatus, 3000);

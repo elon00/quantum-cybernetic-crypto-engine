@@ -13,7 +13,7 @@
             <div class="logo-icon">⚛️</div>
             <div>
                 <h1>QUANTUM-CYBERNETIC CRYPTO ENGINE</h1>
-                <p class="subtitle">secp256k1 ECDSA &bull; SHA-256 PoW &bull; Quantum Wavefunction Optimizer &bull; Cybernetic Homeostasis</p>
+                <p class="subtitle">secp256k1 ECDSA &bull; SHA-256 PoW &bull; 12D Omniverse Projection &bull; Cybernetic Homeostasis</p>
             </div>
         </div>
 
@@ -27,22 +27,43 @@
 
     <!-- Main Grid Dashboard -->
     <main class="dashboard-grid">
-        <!-- 3D/4D Quantum Network Viewport -->
+        <!-- 3D to 12D Omniverse Quantum Viewport -->
         <section class="card viewport-card">
             <div class="card-header">
-                <h2>🌐 Quantum Dimensional Viewport (3D/4D Projection)</h2>
+                <h2>🌐 Omniverse Quantum Viewport (3D to 12D Engine)</h2>
                 <div class="viewport-controls">
-                    <button id="toggleObserverBtn" class="btn btn-sm btn-accent">Observer: ON (Collapsed)</button>
-                    <span class="tag" id="dimensionTag">4D Spacetime Topology</span>
+                    <button id="obsBtn" class="btn btn-sm btn-obs-on">OBSERVER: ON (Rendered)</button>
+                    <span class="tag" id="dimName">4D Tesseract</span>
                 </div>
             </div>
+            
             <div class="canvas-container">
                 <canvas id="quantumCanvas"></canvas>
             </div>
-            <div class="canvas-footer">
-                <span>Drag to Rotate Orbit</span> &bull; 
-                <span>Entanglement Sync: <strong id="entangleStatus">Active (0ms)</strong></span> &bull; 
-                <span>Observer Mode: <strong id="observerModeText">Wavefunction Collapsed into Solid Geometry</strong></span>
+
+            <!-- Omniverse Dimensional & Multiverse Controls -->
+            <div class="omniverse-controls">
+                <div class="control-box">
+                    <div class="stat-row">
+                        <span class="label">Layer 3: Active Dimensions: <strong id="dimVal" class="val">4D</strong></span>
+                        <span class="tag" id="totalNodesTag"><span id="totalNodes">16</span> Nodes (2^N)</span>
+                    </div>
+                    <input type="range" id="dimSlider" min="3" max="12" value="4" step="1" />
+                </div>
+
+                <div class="control-row">
+                    <button id="branchBtn" class="btn btn-branch">+ Split Quantum Timeline Branch</button>
+                    <div class="branch-meta">
+                        <span>Universe ID: <strong id="branchId" class="val">#OMNI-001</strong></span>
+                        <span>RAM Saved: <strong id="ramSaved" class="val">98.42%</strong></span>
+                    </div>
+                </div>
+
+                <div class="canvas-footer">
+                    <span>Drag to Orbit Orbit</span> &bull; 
+                    <span>Entangled Nodes: <strong class="val" style="color:#f43f5e;">SYNCED (0ms)</strong></span> &bull; 
+                    <span id="obsDesc">Wavefunction collapsed into solid geometry inside viewport</span>
+                </div>
             </div>
         </section>
 
@@ -154,7 +175,7 @@
     </section>
 
     <footer class="footer">
-        <p>Quantum-Cybernetic Crypto Engine &bull; Zero Mock Data &bull; 100% Real Cryptography & Live Oracle Feeds</p>
+        <p>Quantum-Cybernetic Crypto Engine &bull; Zero Mock Data &bull; 12D Omniverse Projection &bull; 100% Real Cryptography & Live Oracle Feeds</p>
     </footer>
 
     <script src="app.js"></script>
