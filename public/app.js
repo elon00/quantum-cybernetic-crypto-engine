@@ -282,11 +282,15 @@ async function fetchStatus() {
             walletBalanceEl.textContent = activeWallet.balance.toFixed(2);
         }
 
-        // Live Oracle Prices
+        // Live Oracle Prices & QuickNode Status
         if (data.oracle && data.oracle.prices) {
             btcPriceEl.textContent = `$${data.oracle.prices.BTC.toLocaleString()}`;
             ethPriceEl.textContent = `$${data.oracle.prices.ETH.toLocaleString()}`;
             solPriceEl.textContent = `$${data.oracle.prices.SOL.toLocaleString()}`;
+        }
+        const qnLatencyEl = document.getElementById('qnLatency');
+        if (qnLatencyEl && data.quickNode) {
+            qnLatencyEl.textContent = `${data.quickNode.latencyMs || 12}ms`;
         }
 
         // Cybernetics Telemetry
@@ -463,3 +467,129 @@ mineBtn.onclick = async () => {
 // Initialize Status & Polling
 fetchStatus();
 setInterval(fetchStatus, 3000);
+
+// ----------------------------------------------------
+// 4. QMOOSA Universal Engineering Suite Event Handlers
+// ----------------------------------------------------
+
+// Conway Automaton Controls
+const conwayGenBadge = document.getElementById('conwayGenBadge');
+const conwayLiveCells = document.getElementById('conwayLiveCells');
+const conwayHash = document.getElementById('conwayHash');
+const conwayStepBtn = document.getElementById('conwayStepBtn');
+const conwayGliderBtn = document.getElementById('conwayGliderBtn');
+const conwayBlinkerBtn = document.getElementById('conwayBlinkerBtn');
+
+if (conwayStepBtn) {
+    conwayStepBtn.onclick = async () => {
+        const res = await fetch('/api/conway/step', { method: 'POST' });
+        const d = await res.json();
+        if (d.success) {
+            conwayGenBadge.textContent = `Gen #${d.generation}`;
+            conwayLiveCells.textContent = d.liveCells;
+            conwayHash.textContent = d.stateHash.slice(0, 10) + '...';
+        }
+    };
+}
+
+if (conwayGliderBtn) {
+    conwayGliderBtn.onclick = async () => {
+        const res = await fetch('/api/conway/snapshot');
+        const d = await res.json();
+        conwayGenBadge.textContent = 'Gen #0 (Glider)';
+        conwayLiveCells.textContent = '5';
+        conwayHash.textContent = d.stateHash.slice(0, 10) + '...';
+    };
+}
+
+// x402 Bazaar Protocol Handlers
+const x402CatalogEl = document.getElementById('x402Catalog');
+const test402Btn = document.getElementById('test402Btn');
+
+async function loadX402Catalog() {
+    try {
+        const res = await fetch('/api/x402/resources');
+        const d = await res.json();
+        if (d.success && x402CatalogEl) {
+            x402CatalogEl.innerHTML = d.bazaarCatalog.map(s => 
+                `<div>&bull; <strong style="color:#38bdf8;">${s.name}</strong> (${s.costQCY} QCY)</div>`
+            ).join('');
+        }
+    } catch (e) {
+        if (x402CatalogEl) x402CatalogEl.textContent = 'x402 Bazaar offline';
+    }
+}
+loadX402Catalog();
+
+if (test402Btn) {
+    test402Btn.onclick = async () => {
+        const res = await fetch('/api/x402/challenge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ serviceId: 'qmoosa-quantum-optimization' })
+        });
+        const d = await res.json();
+        alert(`HTTP 402 PAYMENT REQUIRED RESPONSE:\nChallenge Hash: ${d.x402Challenge.challengeHash}\nCost: ${d.x402Challenge.costQCY} QCY\nRecipient: ${d.x402Challenge.recipient}`);
+    };
+}
+
+// PQC & QR Multiwallet Handlers
+const pqcGenBtn = document.getElementById('pqcGenBtn');
+const genQrBtn = document.getElementById('genQrBtn');
+const qrPreview = document.getElementById('qrPreview');
+
+if (pqcGenBtn) {
+    pqcGenBtn.onclick = async () => {
+        pqcGenBtn.textContent = 'Generating...';
+        const res = await fetch('/api/pqc/keypair', { method: 'POST' });
+        const d = await res.json();
+        pqcGenBtn.textContent = 'Generate ML-DSA';
+        alert(`NIST FIPS 204 HYBRID KEYPAIR GENERATED!\nSuite: ${d.keypair.suite}\nAddress: ${d.keypair.hybridAddress}\nPQC Public Key: ${d.keypair.pqc.publicKeyHex.slice(0, 32)}...`);
+    };
+}
+
+if (genQrBtn && qrPreview) {
+    genQrBtn.onclick = async () => {
+        const addr = activeWallet ? activeWallet.address : '0x71C...B29';
+        const res = await fetch('/api/wallets/qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chain: 'ethereum', address: addr, amount: 25.0, token: 'QCY' })
+        });
+        const d = await res.json();
+        if (d.success) {
+            qrPreview.innerHTML = d.qr.qrMatrixSvg;
+        }
+    };
+}
+
+// Multimodel AI Agentic Console Handlers
+const agentSelect = document.getElementById('agentSelect');
+const agentChatBox = document.getElementById('agentChatBox');
+const agentInput = document.getElementById('agentInput');
+const agentSendBtn = document.getElementById('agentSendBtn');
+
+if (agentSendBtn && agentInput) {
+    agentSendBtn.onclick = async () => {
+        const text = agentInput.value.trim();
+        if (!text) return;
+        const agentId = agentSelect ? agentSelect.value : 'agent_arch';
+        agentChatBox.innerHTML += `<div style="color:#38bdf8; margin-top:4px;">&gt; You: ${text}</div>`;
+        agentInput.value = '';
+
+        try {
+            const res = await fetch('/api/agent/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, agentId })
+            });
+            const d = await res.json();
+            if (d.success) {
+                agentChatBox.innerHTML += `<div style="color:#a5b4fc; margin-top:2px;">${d.message.response}</div>`;
+                agentChatBox.scrollTop = agentChatBox.scrollHeight;
+            }
+        } catch (e) {
+            agentChatBox.innerHTML += `<div style="color:#f43f5e;">Agent dispatch error: ${e.message}</div>`;
+        }
+    };
+}

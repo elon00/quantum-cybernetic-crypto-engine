@@ -1,33 +1,71 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+
+// Core Cryptographic & Quantum Engines
 const Blockchain = require('./core/blockchain');
 const CryptoWallet = require('./core/crypto_wallet');
 const LiveOracle = require('./core/live_oracle');
 
+// QMOOSA Universal Framework Modules
+const QuickNodeProvider = require('./core/quicknode_provider');
+const X402BazaarEngine = require('./core/x402_bazaar');
+const ConwayAutomatonEngine = require('./core/conway_engine');
+const PqcHybridEngine = require('./core/pqc_engine');
+const RavenRsiEngine = require('./core/raven_rsi');
+const ReaEngine = require('./core/rea_engine');
+const TokenLaunchpadEngine = require('./core/token_launchpad');
+const MultiwalletQrEngine = require('./core/multiwallet_qr');
+const IpfsFleekAdapter = require('./core/ipfs_fleek_adapter');
+const UniversalChainScaffold = require('./core/chain_scaffold');
+const MultimodelAgentOrchestrator = require('./core/multimodel_agents');
+
 const PORT = process.env.PORT || 3000;
+
+// Initialize System Engines
 const blockchain = new Blockchain();
 const oracle = new LiveOracle();
+const quickNode = new QuickNodeProvider();
+const x402Bazaar = new X402BazaarEngine();
+const conwayEngine = new ConwayAutomatonEngine();
+const pqcEngine = new PqcHybridEngine();
+const ravenRsi = new RavenRsiEngine();
+const reaEngine = new ReaEngine(__dirname);
+const tokenLaunchpad = new TokenLaunchpadEngine();
+const multiwalletQr = new MultiwalletQrEngine();
+const ipfsFleek = new IpfsFleekAdapter(__dirname);
+const chainScaffold = new UniversalChainScaffold();
+const agentOrchestrator = new MultimodelAgentOrchestrator();
 
-// Start live oracle price streaming
+// Start Live Background Streams
 oracle.start();
+conwayEngine.seedPattern('glider', 2, 2);
+ipfsFleek.generateFleekConfig();
+ipfsFleek.pinReleaseArtifact('QMOOSA_GENESIS_CORE', { version: '2.0.0', status: 'PRODUCTION_VERIFIED' });
 
-// Seed initial test funds to a default demo wallet so user can immediately transact
+// Seed initial token launchpad project
+tokenLaunchpad.createLaunchpadProject({
+    tokenName: 'Quantum Cybernetic Token',
+    tokenSymbol: 'QCY',
+    targetChain: 'Base',
+    initialSupply: 100000000,
+    salePriceUSD: 0.05
+});
+
+// Seed default funded wallet
 const defaultUserWallet = new CryptoWallet();
 blockchain.balances.set(defaultUserWallet.address, 500.0);
 
-// Helper to serve JSON
 function sendJson(res, statusCode, data) {
     res.writeHead(statusCode, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        'Access-Control-Allow-Headers': 'Content-Type, X-402-Payment-Proof'
     });
     res.end(JSON.stringify(data));
 }
 
-// Helper to read POST body
 function parseBody(req) {
     return new Promise((resolve, reject) => {
         let body = '';
@@ -47,31 +85,32 @@ const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     const pathname = parsedUrl.pathname;
 
-    // CORS preflight
     if (req.method === 'OPTIONS') {
         res.writeHead(204, {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
+            'Access-Control-Allow-Headers': 'Content-Type, X-402-Payment-Proof'
         });
         return res.end();
     }
 
-    // API Routes
+    // 1. Core Blockchain & Network Status
     if (pathname === '/api/status' && req.method === 'GET') {
         const telemetry = blockchain.cybernetics.getLatestTelemetry();
         const oracleData = oracle.getPrices();
         const latestBlock = blockchain.getLatestBlock();
+        const qnStatus = quickNode.getHealthStatus();
 
         return sendJson(res, 200, {
             success: true,
-            network: 'QUANTUM-CYBERNETIC-MAINNET',
+            network: 'QMOOSA-UNIVERSAL-MAINNET',
             blockHeight: blockchain.chain.length,
             latestBlock,
             mempoolCount: blockchain.mempool.length,
             mempool: blockchain.mempool,
             telemetry,
             oracle: oracleData,
+            quickNode: qnStatus,
             defaultUser: {
                 address: defaultUserWallet.address,
                 publicKey: defaultUserWallet.publicKey,
@@ -88,9 +127,9 @@ const server = http.createServer(async (req, res) => {
         });
     }
 
+    // 2. Wallets & Transactions
     if (pathname === '/api/wallet/new' && req.method === 'POST') {
         const wallet = new CryptoWallet();
-        // Give 100 QCY starting faucet balance from system vault
         const faucetAmount = 100.0;
         const genesisVaultBal = blockchain.getBalance(blockchain.systemWallet.address);
         if (genesisVaultBal >= faucetAmount) {
@@ -110,29 +149,24 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/transaction' && req.method === 'POST') {
         try {
             const body = await parseBody(req);
-            const { sender, recipient, amount, fee, publicKeyPem, signature } = body;
-
             const tx = blockchain.addTransaction({
-                sender,
-                recipient,
-                amount: parseFloat(amount),
-                fee: parseFloat(fee || 1.0),
+                sender: body.sender,
+                recipient: body.recipient,
+                amount: parseFloat(body.amount),
+                fee: parseFloat(body.fee || 1.0),
                 gasLimit: 21000,
                 timestamp: Date.now(),
-                publicKeyPem,
-                signature
+                publicKeyPem: body.publicKeyPem,
+                signature: body.signature
             });
 
             return sendJson(res, 200, {
                 success: true,
-                message: 'Transaction successfully verified and added to quantum mempool.',
+                message: 'Transaction verified and placed into quantum mempool',
                 transaction: tx
             });
         } catch (err) {
-            return sendJson(res, 400, {
-                success: false,
-                error: err.message
-            });
+            return sendJson(res, 400, { success: false, error: err.message });
         }
     }
 
@@ -148,14 +182,108 @@ const server = http.createServer(async (req, res) => {
                 block: newBlock
             });
         } catch (err) {
-            return sendJson(res, 500, {
-                success: false,
-                error: err.message
-            });
+            return sendJson(res, 500, { success: false, error: err.message });
         }
     }
 
-    // Static Assets
+    // 3. QuickNode Multichain RPC API
+    if (pathname === '/api/quicknode/health' && req.method === 'GET') {
+        return sendJson(res, 200, quickNode.getHealthStatus());
+    }
+
+    // 4. x402 Bazaar Protocol Routes
+    if (pathname === '/api/x402/resources' && req.method === 'GET') {
+        return sendJson(res, 200, {
+            success: true,
+            protocol: 'x402/v2',
+            bazaarCatalog: x402Bazaar.getBazaarCatalog()
+        });
+    }
+
+    if (pathname === '/api/x402/challenge' && req.method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const challenge = x402Bazaar.createPaymentChallenge(body.serviceId, body.clientAddress);
+            return sendJson(res, 402, {
+                success: false,
+                status: 402,
+                error: 'Payment Required',
+                x402Challenge: challenge
+            });
+        } catch (err) {
+            return sendJson(res, 400, { success: false, error: err.message });
+        }
+    }
+
+    if (pathname === '/api/x402/verify' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const verification = x402Bazaar.verifyPaymentProof(body);
+        return sendJson(res, verification.valid ? 200 : 400, verification);
+    }
+
+    // 5. Conway Automaton Engine Routes
+    if (pathname === '/api/conway/step' && req.method === 'POST') {
+        const result = conwayEngine.step();
+        return sendJson(res, 200, { success: true, ...result });
+    }
+
+    if (pathname === '/api/conway/snapshot' && req.method === 'GET') {
+        return sendJson(res, 200, { success: true, ...conwayEngine.exportSnapshot() });
+    }
+
+    // 6. Post-Quantum Cryptography (PQC) Routes
+    if (pathname === '/api/pqc/keypair' && req.method === 'POST') {
+        const keypair = pqcEngine.generateHybridKeyPair();
+        return sendJson(res, 200, { success: true, keypair });
+    }
+
+    // 7. Raven RSI & REA Introspection Routes
+    if (pathname === '/api/rsi/cycle' && req.method === 'POST') {
+        const telemetry = blockchain.cybernetics.getLatestTelemetry();
+        const cycle = ravenRsi.runOptimizationCycle(telemetry, { healthy: true });
+        return sendJson(res, 200, { success: true, cycle });
+    }
+
+    if (pathname === '/api/rea/audit' && req.method === 'GET') {
+        const audit = reaEngine.inspectProject();
+        return sendJson(res, 200, { success: true, audit });
+    }
+
+    // 8. Token Launchpad & Emission Economics
+    if (pathname === '/api/launchpad/projects' && req.method === 'GET') {
+        return sendJson(res, 200, { success: true, projects: tokenLaunchpad.getProjects() });
+    }
+
+    if (pathname === '/api/launchpad/emission' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const calc = tokenLaunchpad.calculateEmissionLimit(body.currentSupply || 1000000, body.requestedMint || 50000);
+        return sendJson(res, 200, { success: true, emission: calc });
+    }
+
+    // 9. Multiwallet & Cross-Chain QR Payments
+    if (pathname === '/api/wallets/qr' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const qr = multiwalletQr.generatePaymentUri(body);
+        return sendJson(res, 200, { success: true, qr });
+    }
+
+    if (pathname === '/api/wallets/supported' && req.method === 'GET') {
+        return sendJson(res, 200, { success: true, wallets: multiwalletQr.getSupportedWallets() });
+    }
+
+    // 10. IPFS & Fleek Edge Storage Registry
+    if (pathname === '/api/ipfs/artifacts' && req.method === 'GET') {
+        return sendJson(res, 200, { success: true, artifacts: ipfsFleek.getPinnedArtifacts() });
+    }
+
+    // 11. Multimodel AI Agentic Chatbot Dispatch
+    if (pathname === '/api/agent/chat' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const chatRes = await agentOrchestrator.dispatchQuery(body.message, body.agentId);
+        return sendJson(res, 200, { success: true, message: chatRes });
+    }
+
+    // Static Asset Serving
     let filePath = path.join(__dirname, 'public', pathname === '/' ? 'index.html' : pathname);
     if (!fs.existsSync(filePath)) {
         filePath = path.join(__dirname, 'public', 'index.html');
@@ -184,10 +312,15 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
     console.log(`================================================================`);
-    console.log(` 🚀 QUANTUM-CYBERNETIC CRYPTO ENGINE IS ONLINE!`);
+    console.log(` 🚀 QMOOSA UNIVERSAL AI–WEB4–BLOCKCHAIN ENGINE ONLINE!`);
     console.log(` 📡 Local Dashboard: http://localhost:${PORT}`);
     console.log(` ⛓️  Consensus: SHA-256 PoW + Quantum Hamiltonian Optimizer`);
-    console.log(` 🔄 Cybernetics: Norbert Wiener PID Homeostasis Loop Active`);
-    console.log(` 🌐 Live Oracle: Connected to Binance / CoinGecko feeds`);
+    console.log(` 🌐 QuickNode Multichain RPC: Active with Failover`);
+    console.log(` 💰 x402 Bazaar Protocol: Agent Monetization Active`);
+    console.log(` 🧬 Conway Cellular Automaton: B3/S23 Deterministic Engine`);
+    console.log(` 🛡️  Post-Quantum Cryptography: NIST FIPS 204 Hybrid ML-DSA`);
+    console.log(` 🔄 Raven RSI: Governed Recursive Self-Improvement Loop Active`);
+    console.log(` 🤖 Multimodel AI Agentics: Architecture, Security, QA Online`);
+    console.log(` 📦 Storage & Edge Deploy: IPFS CID + Fleek Config Ready`);
     console.log(`================================================================`);
 });

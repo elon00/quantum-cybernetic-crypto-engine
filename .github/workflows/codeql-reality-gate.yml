@@ -1,0 +1,51 @@
+name: "QMOOSA Reality Gate & CodeQL Verification"
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  reality-check:
+    name: "Reality Gate: Testing & CodeQL"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Run Deterministic Unit & Integration Tests
+        run: node test.js
+
+      - name: Run Automated Smoke Test
+        run: node tests/smoke.test.js
+
+      - name: Run Automated Regression Test
+        run: node tests/regression.test.js
+
+      - name: Run Mathematical Sanity Test
+        run: node tests/sanity.test.js
+
+      - name: Run In-Tree CodeQL Security Audit
+        run: node tests/codeql_check.js
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"

@@ -510,3 +510,33 @@ input[type="range"] {
     font-size: 0.75rem;
     color: #475569;
 }
+
+/* QMOOSA Universal Engineering Suite Grid */
+.suite-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+    .suite-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .suite-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.suite-card {
+    padding: 14px;
+    gap: 10px;
+}
+
+.suite-body {
+    display: flex;
+    flex-direction: column;
+}
