@@ -29,9 +29,14 @@ node tests/sanity.test.js
 if ($LASTEXITCODE -ne 0) { Write-Host "❌ Sanity tests failed!" -ForegroundColor Red; exit 1 }
 
 # Step 5: CodeQL Static Security Audit
-Write-Host "`n[5/5] Running CodeQL Static Security Audit..." -ForegroundColor Yellow
+Write-Host "`n[5/6] Running CodeQL Static Security Audit..." -ForegroundColor Yellow
 node tests/codeql_check.js
 if ($LASTEXITCODE -ne 0) { Write-Host "❌ Security audit failed!" -ForegroundColor Red; exit 1 }
+
+# Step 6: Universal Smart Scaffold Engine (IPFS, Fleek, QuickNode, Smart Contracts, Adapters)
+Write-Host "`n[6/6] Executing QMOOSA Universal Smart Scaffold Engine (6 Pillars)..." -ForegroundColor Yellow
+node scaffold/cli.js all
+if ($LASTEXITCODE -ne 0) { Write-Host "❌ Scaffold execution failed!" -ForegroundColor Red; exit 1 }
 
 Write-Host "`n======================================================================" -ForegroundColor Green
 Write-Host " 🎉 ALL 5 REALITY GATES PASSED! AUDIT SCORE: 100/100 VERIFIED" -ForegroundColor Green
